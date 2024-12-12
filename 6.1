@@ -1,0 +1,59 @@
+// Pines de entrada para el DIPSW
+const int DIP_A = 2;
+const int DIP_B = 3;
+const int DIP_C = 4;
+const int DIP_D = 5;
+
+// Pines de salida para el display de 7 segmentos
+const int SEG_A = 6;
+const int SEG_B = 7;
+const int SEG_C = 8;
+const int SEG_D = 9;
+const int SEG_E = 10;
+const int SEG_F = 11;
+const int SEG_G = 12;
+
+void setup() {
+  // Configurar entradas DIPSW con resistencias pull-up
+  pinMode(DIP_A, INPUT_PULLUP);
+  pinMode(DIP_B, INPUT_PULLUP);
+  pinMode(DIP_C, INPUT_PULLUP);
+  pinMode(DIP_D, INPUT_PULLUP);
+
+  // Configurar salidas del display
+  pinMode(SEG_A, OUTPUT);
+  pinMode(SEG_B, OUTPUT);
+  pinMode(SEG_C, OUTPUT);
+  pinMode(SEG_D, OUTPUT);
+  pinMode(SEG_E, OUTPUT);
+  pinMode(SEG_F, OUTPUT);
+  pinMode(SEG_G, OUTPUT);
+}
+
+void loop() {
+  // Leer entradas DIPSW (inversión lógica porque están en pull-up)
+  int A = !digitalRead(DIP_A);
+  int B = !digitalRead(DIP_B);
+  int C = !digitalRead(DIP_C);
+  int D = !digitalRead(DIP_D);
+
+  // Evaluar funciones booleanas para cada segmento
+  bool segA = (!A && C) || (A && !C && !D) || (!A && B && D) || (!B && !C && !D) || (A && !B && D);
+  bool segB = (!B && !C) || (!A && !B) || (!A && C && D) || (!A && !C && !D);
+  bool segC = (!A && B) || (!A && D) || (!B && !C);
+  bool segD = (A && !B && !C) || (!A && C && !D) || (!A && !B && C) || (!B && !C && !D) || (!A && B && !C && D);
+  bool segE = (!A && C && !D) || (!B && !C && !D);
+  bool segF = (A && !B && !C) || (!A && B && !D) || (!A && B && !C) || (!B && !C && !D);
+  bool segG = (A && !B && !C) || (!A && B && !C) || (!A && C && !D) || (!A && !B && C);
+
+  // Actualizar segmentos del display (ánodo común: LOW enciende el segmento)
+  digitalWrite(SEG_A, !segA);
+  digitalWrite(SEG_B, !segB);
+  digitalWrite(SEG_C, !segC);
+  digitalWrite(SEG_D, !segD);
+  digitalWrite(SEG_E, !segE);
+  digitalWrite(SEG_F, !segF);
+  digitalWrite(SEG_G, !segG);
+
+  delay(100); // Pequeño retardo para estabilidad
+}
