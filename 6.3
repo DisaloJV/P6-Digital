@@ -1,0 +1,60 @@
+#include <Arduino.h>
+
+void setup() {
+  Serial.begin(9600);
+  
+  // Declarar las variables como unsigned
+  uint8_t var0 = -12;        // 1 byte (8 bits)
+  uint16_t var1 = -15200;    // 2 bytes (16 bits)
+  uint32_t var2 = -1333000777; // 4 bytes (32 bits)
+  Serial.println(" ");
+
+  // Imprimir la cabecera de la tabla
+  Serial.println("Variable\tDecimal\t\tBinario");
+  
+  // Mostrar cada variable en decimal y binario
+  Serial.print("var0\t\t");
+  Serial.print(var0); // Valor en decimal
+  Serial.print("\t\t");
+  Serial.println(byteToBinary(var0)); // Valor en binario
+  
+  Serial.print("var1\t\t");
+  Serial.print(var1); // Valor en decimal
+  Serial.print("\t\t");
+  Serial.println(wordToBinary(var1)); // Valor en binario
+  
+  Serial.print("var2\t\t");
+  Serial.print(var2); // Valor en decimal
+  Serial.print("\t");
+  Serial.println(dwordToBinary(var2)); // Valor en binario
+}
+
+void loop() {
+}
+
+// Función para convertir un byte (8 bits) en binario como String
+String byteToBinary(uint8_t value) {
+  String binary = "";
+  for (int i = 7; i >= 0; i--) {
+    binary += (value & (1 << i)) ? "1" : "0";
+  }
+  return binary;
+}
+
+// Función para convertir una palabra (16 bits) en binario como String
+String wordToBinary(uint16_t value) {
+  String binary = "";
+  for (int i = 15; i >= 0; i--) {
+    binary += (value & (1 << i)) ? "1" : "0";
+  }
+  return binary;
+}
+
+// Función para convertir un doble palabra (32 bits) en binario como String
+String dwordToBinary(uint32_t value) {
+  String binary = "";
+  for (int i = 31; i >= 0; i--) {
+    binary += (value & (1 << i)) ? "1" : "0";
+  }
+  return binary;
+}
