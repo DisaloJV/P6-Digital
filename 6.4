@@ -1,0 +1,122 @@
+const int leds[] = {2, 3, 4, 5, 6, 7, 8, 9};  // Pines de los LEDs
+int numero = 0;
+bool operacionActiva = false;  // Controlar operaciones en curso
+
+void setup() {
+  for (int i = 0; i < 8; i++) {
+    pinMode(leds[i], OUTPUT);
+  }
+  Serial.begin(9600);
+  actualizarLEDS();
+}
+
+void loop() {
+  if (Serial.available()) {
+    char input = Serial.peek();  // Mirar el primer carácter
+    
+    if (operacionActiva && input != 'O') {
+      Serial.read();  // Limpiar el buffer del carácter inválido
+      return;
+    }
+
+    if ((input == '-') || (input >= '0' && input <= '9')) {
+      int temp = Serial.parseInt();  // Leer el número completo
+      if (temp >= -127 && temp <= 128) {
+        numero = temp;
+        actualizarLEDS();
+      }
+    } else {
+      char comando = Serial.read();  // Lee el comando
+      procesarComando(comando);
+    }
+  }
+}
+
+void procesarComando(char comando) {
+  switch (comando) {
+    case 'A':
+      operacionActiva = true;
+      conteoAscendente();
+      break;
+    case 'B':
+      operacionActiva = true;
+      conteoDescendente();
+      break;
+    case 'R':
+      numero = 0;
+      actualizarLEDS();
+      break;
+    case '<':
+      operacionActiva = true;
+      desplazarIzquierda();
+      break;
+    case '>':
+      operacionActiva = true;
+      desplazarDerecha();
+      break;
+    case 'D':
+      numero = ~numero;  // Complemento a 1
+      actualizarLEDS();
+      break;
+    case 'E':
+      numero = ~numero + 1;  // Complemento a 2
+      actualizarLEDS();
+      break;
+    case 'O':
+      operacionActiva = false;
+      break;
+    default:
+      // Ignorar caracteres inválidos
+      break;
+  }
+}
+
+void actualizarLEDS() {
+  for (int i = 0; i < 8; i++) {
+    digitalWrite(leds[i], (numero >> i) & 1);
+  }
+}
+
+void conteoAscendente() {
+  while (operacionActiva) {
+    numero++;
+    actualizarLEDS();
+    delay(500);
+    if (Serial.available() && Serial.read() == 'O') {
+      operacionActiva = false;
+    }
+  }
+}
+
+void conteoDescendente() {
+  while (operacionActiva) {
+    numero--;
+    actualizarLEDS();
+    delay(500);
+    if (Serial.available() && Serial.read() == 'O') {
+      operacionActiva = false;
+    }
+  }
+}
+
+void desplazarIzquierda() {
+  while (operacionActiva) {
+    numero = (numero << 1) | ((numero & 0x80) >> 7);
+    actualizarLEDS();
+    delay(500);
+    if (Serial.available() && Serial.read() == 'O') {
+      operacionActiva = false;
+    }
+  }
+}
+
+void desplazarDerecha() {
+  while (operacionActiva) {
+    numero = (numero >> 1) | ((numero & 0x01) << 7);
+    actualizarLEDS();
+    delay(500);
+    if (Serial.available() && Serial.read() == 'O') {
+      operacionActiva = false;
+    }
+  }
+}
