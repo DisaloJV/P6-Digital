@@ -1,0 +1,60 @@
+// Pines para las entradas analógicas
+const int pot1 = A0; 
+const int pot2 = A1; 
+const int pot3 = A2; 
+const int pot4 = A3; 
+
+const int ledPin = 13; 
+
+// Umbrales para determinar 0 o 1 
+const int threshold1 = 512; 
+const int threshold2 = 512;
+const int threshold3 = 512;
+const int threshold4 = 512;
+
+// Función booleana 
+bool evaluateLogic(bool W, bool X, bool Y, bool Z) {
+  return (W && X && Y) || (X && Y && Z);
+}
+
+void setup() {
+  pinMode(ledPin, OUTPUT);
+  
+  // Inicializar comunicación serial para depuración
+  Serial.begin(9600);
+}
+
+void loop() {
+  // Leer los valores de los potenciómetros
+  int value1 = analogRead(pot1);
+  int value2 = analogRead(pot2);
+  int value3 = analogRead(pot3);
+  int value4 = analogRead(pot4);
+
+  // Mostrar valores analógicos para diagnóstico
+  Serial.print("Pot1: "); Serial.print(value1);
+  Serial.print(" | Pot2: "); Serial.print(value2);
+  Serial.print(" | Pot3: "); Serial.print(value3);
+  Serial.print(" | Pot4: "); Serial.println(value4);
+
+  // Convertir valores analógicos en lógicos según los umbrales
+  bool W = (value1 >= threshold1);
+  bool X = (value2 >= threshold2);
+  bool Y = (value3 >= threshold3);
+  bool Z = (value4 >= threshold4);
+
+  // Evaluar la lógica y determinar el estado del LED
+  bool ledState = evaluateLogic(W, X, Y, Z);
+
+  // Mostrar estados lógicos en el monitor serial
+  Serial.print("W: "); Serial.print(W);
+  Serial.print(", X: "); Serial.print(X);
+  Serial.print(", Y: "); Serial.print(Y);
+  Serial.print(", Z: "); Serial.print(Z);
+  Serial.print(" -> LED: "); Serial.println(ledState);
+
+  // Controlar el LED
+  digitalWrite(ledPin, ledState ? HIGH : LOW);
+
+  delay(200);
+}
